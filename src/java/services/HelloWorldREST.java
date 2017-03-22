@@ -25,26 +25,11 @@ import javax.ws.rs.Produces;
  *
  * @author c0537794
  */
-@Path("/hello")
+@Path("hello")
 @ApplicationScoped
 public class HelloWorldREST {
     @Inject
     private HelloWorldController HelloWorldControllerList;
     
-    @GET
-    @Produces("application/json")
-    public JsonObject hello() {
-        JsonObjectBuilder json = Json.createObjectBuilder();
-        JsonArrayBuilder arr = Json.createArrayBuilder();
-        for (int i = 0; i < 100; i++) {
-            JsonObjectBuilder subjson = Json.createObjectBuilder();
-            for (int j = 0; j < 10; j++) {
-                subjson.add("object" + 1 + "-" + j, i * j);
-            }
-            arr.add(subjson);
-        }
-        json.add("array", arr);
-        return json.build();
-    }  
     
 }

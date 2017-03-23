@@ -13,54 +13,49 @@ import java.util.logging.Logger;
 import javax.json.Json;
 import javax.json.JsonObject;
 
-
 /**
  *
  * @author c0537794
  */
 public class HelloWorld {
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
     int id;
     String title;
     String contents;
     String author;
     Date senttime;
+
     
-   
-    
-   SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
-    public HelloWorld(JsonObject json) {
-            id = json.getInt("id",0); 
-            title = json.getString("title","");
-            contents = json.getString("contents","");
-            author = json.getString("author","");
-           String timeStr = json.getString("senttime", "");
-            try{
-            senttime = sdf.parse(json.getString("senttime"));  
-            } catch (ParseException ex){
-                Logger.getLogger(HelloWorld.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    public HelloWorld() {
+       
     }
-    
-    public JsonObject JsonObject() {
+
+    public HelloWorld(JsonObject json) {
+        id = json.getInt("id", 0);
+        title = json.getString("title", "");
+        contents = json.getString("contents", "");
+        author = json.getString("author", "");
+        String timeStr = json.getString("senttime", "");
+        try {
+            senttime = sdf.parse(json.getString("senttime"));
+        } catch (ParseException ex) {
+            Logger.getLogger(HelloWorld.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public JsonObject toJson() {
         String timeStr = sdf.format(senttime);
-        JsonObject json = Json.createObjectBuilder()
-        .add("id", id)
-        .add("title", title)
+        return Json.createObjectBuilder()
+                .add("id", id)
+                .add("title", title)
                 .add("contents", contents)
                 .add("author", author)
                 .add("senttime", timeStr)
                 .build();
-        return json;
+  
     }
-    
 
-    public HelloWorld(int id, String title, String contents, String author, Date senttime) {
-        this.id = id;
-        this.title = title;
-        this.contents = contents;
-        this.author = author;
-        this.senttime = senttime;
-    }
 
     public int getId() {
         return id;
@@ -101,8 +96,5 @@ public class HelloWorld {
     public void setSentTime(Date senttime) {
         this.senttime = senttime;
     }
-    
-    
-    
 
 }

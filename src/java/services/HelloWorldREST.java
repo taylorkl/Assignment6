@@ -29,7 +29,7 @@ import javax.ws.rs.core.Response;
  *
  * @author c0537794
  */
-@Path("/hello")
+@Path("/services")
 @ApplicationScoped
 public class HelloWorldREST {
     @Inject

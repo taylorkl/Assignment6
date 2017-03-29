@@ -5,6 +5,12 @@
  */
 package services;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,10 +47,29 @@ public class HelloWorldController {
     }
     
     public HelloWorld getById(int id) {
-        for (HelloWorld h : HelloWorldList) {
+        try (Connection conn = messages.getConnection()) {
+            HelloWorldList = new ArrayList<>();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM messages");
+            while (rs.next()) {
+                HelloWorld h = new HelloWorld (
+                rs.getInt("id"),
+                rs.getString("title"),
+                rs.getString("contents"),
+                rs.getString("author"),
+                rs.timeStamp("senttime")
+                );
+                HelloWorld.add(h);
+            }
+            for (HelloWorld h : HelloWorldList) {
             if (h.getId() == id) {
                 return h;
+        }
+
             }
+        }catch (SQLException ex) {
+            Logger.getLogger(HelloWorld.class.getName()).log(Level.SEVERE, null,ex);
+            HelloWorld = new ArrayList<>();
         }
         return null;
     }
@@ -98,4 +123,52 @@ public class HelloWorldController {
            return false;
        }
    }
+   
+    public final static String SALT = "THISISArandomSTRINGofCHARACTERSusedTOsaltTHEpasswords";
+    
+    /**
+     * 
+     * @param password
+     * @return
+     */
+    public static String hash(String password) {
+        try {
+            String salted = password + SALT;
+            MessageDigest md = MessageDigest.getInstance("SHA1");
+            byte[] hash = md.digest(salted.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            for (byte b: hash) {
+                String hex = Integer.toHexString(b & 0xff).toUpperCase();
+                if (hex.length()== 1) {
+                    sb.append("0");
+                }
+                sb.append(hex);
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+            Logger.getLogger(HelloWorldController.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    /**
+     * 
+     * @return
+     * @throws SQLException
+     */
+    public static Connection getConnection() throws SQLException {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        }catch (ClassNotFoundException ex) {
+            Logger.getLogger(HelloWorldController.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+        String hostname = "IPRO";
+        String port = "3306";
+        String dbname = "c0537794-java";
+        String username = "c0537794-java";
+        String password = "c0537794";
+        String jdbc = String.format("jdbc:mysql://%s:%s/%s", hostname, port, dbname);
+        return DriverManager.getConnection(jdbc, username, password);
+    }
 }

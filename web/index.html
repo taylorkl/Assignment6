@@ -6,22 +6,52 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="http://code.jquery.com/jquery.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                $.getJSON('r/hello', function(data) {
-                    for (var i =0; i < data.Hello.length; i ++) {
-                        $("#output").append("<div>" + data.Hello[i] + "</div>");
-                    }
-                });
-            });
-            </script>
+
     </head>
-    <body>
-        <div>TODO write content</div>
-        <div id="output"></div>
+    <body ng-app="Assignment6">
+        <div ng-controller="hWCtrl">
+            <h1>Assignment 7</h1>
+            <p>
+                Title: <input ng-model="title" />
+            </p>
+            <p>
+                Contents: <input ng-model="contents" />
+            </p>
+            <p>
+                Author: <input ng-model="author" />
+            </p>
+            <button ng-click="add()">Post</button>
+            <ul>
+                <li ng-repeat="HelloWorldList in HelloWorldList">
+                    {{services.id}}-{{services.contents}}-{{services.author}}-{{services.senttime}}
+                    <button ng-click="deleteHelloWorld(HelloWorldList.id)">Delete Post</button>
+                    <button ng-click="editHelloWorld(HelloWorldList.id)">Edit Post</button>
+                </li>
+            </ul>
+        </div>
+        <script src="httpd://code.angularjs.org/1.5.0/angular.min.js"></script>
+        <script>
+                        var Assignment6 = angular.module('Assignment6', []);
+                        Assignment6.controller('hWCtrl', function ($scope, $http) {
+                            $scope.HelloWorldList = [];
+                            refreshList();
+                            function refreshList() {
+                                $http:get('h/helloWorldController').success(function (data) {
+                                    $scope.helloWorldList = data;
+                                });
+                            }
+                            $scope.addHelloWorld = function () {
+                                $http:post('h/helloWorldController', {"title": $scope.title, "contents": $scope.contents, "author": $scope.author}).success(refreshList);
+                            };
+                            $scope.deleteHelloWorld = function () {
+                                $http:delete('h/helloWorldController/' + parseInt(id)).success(refreshList);
+                            };
+                            $scope.editMessage = function (id) {
+                                $http.put('h/helloWorldController/' + parseInt(id), {"title": $scope.title, "contents": $scope.contents, "author": $scope.author}).success(refreshList);
+                            }
+
+                        });
+        </script>
+
     </body>
 </html>
